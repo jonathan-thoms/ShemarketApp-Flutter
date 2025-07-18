@@ -19,13 +19,19 @@ class _ProductImagesState extends State<ProductImages> {
   int selectedImage = 0;
   @override
   Widget build(BuildContext context) {
+    final image = widget.product.images[selectedImage];
+    final isNetwork = image.startsWith('http://') ||
+        image.startsWith('https://') ||
+        image.contains('firebasestorage.googleapis.com');
     return Column(
       children: [
         SizedBox(
           width: 238,
           child: AspectRatio(
             aspectRatio: 1,
-            child: Image.asset(widget.product.images[selectedImage]),
+            child: isNetwork
+                ? Image.network(image)
+                : Image.asset(image),
           ),
         ),
         // SizedBox(height: 20),
@@ -69,6 +75,9 @@ class SmallProductImage extends StatefulWidget {
 class _SmallProductImageState extends State<SmallProductImage> {
   @override
   Widget build(BuildContext context) {
+    final isNetwork = widget.image.startsWith('http://') ||
+        widget.image.startsWith('https://') ||
+        widget.image.contains('firebasestorage.googleapis.com');
     return GestureDetector(
       onTap: widget.press,
       child: AnimatedContainer(
@@ -83,7 +92,9 @@ class _SmallProductImageState extends State<SmallProductImage> {
           border: Border.all(
               color: kPrimaryColor.withOpacity(widget.isSelected ? 1 : 0)),
         ),
-        child: Image.asset(widget.image),
+        child: isNetwork
+            ? Image.network(widget.image)
+            : Image.asset(widget.image),
       ),
     );
   }

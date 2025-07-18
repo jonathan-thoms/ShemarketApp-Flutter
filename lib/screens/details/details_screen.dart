@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_app/screens/cart/cart_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/firebase_service.dart';
 
 import '../../models/Product.dart';
 import 'components/color_dots.dart';
@@ -18,6 +20,8 @@ class DetailsScreen extends StatelessWidget {
     final ProductDetailsArguments agrs =
         ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
     final product = agrs.product;
+    final FirebaseService firebaseService = FirebaseService();
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -104,8 +108,27 @@ class DetailsScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, CartScreen.routeName);
+              onPressed: () async {
+                if (user == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please sign in to add to cart.')),
+                  );
+                  return;
+                }
+                await firebaseService.addToCart(
+                  userId: user.uid,
+                  product: {
+                    'id': product.id,
+                    'title': product.title,
+                    'price': product.price,
+                    'images': product.images,
+                    'category': product.category,
+                  },
+                  quantity: 1,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Product added to cart!')),
+                );
               },
               child: const Text("Add To Cart"),
             ),

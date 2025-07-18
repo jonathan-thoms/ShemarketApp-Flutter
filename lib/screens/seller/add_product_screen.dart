@@ -23,23 +23,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   String? description;
   double? price;
   List<XFile> selectedImages = [];
-  List<String> colors = [];
+  String? category;
+  final List<String> categories = ['Clothing', 'Food', 'Handicrafts'];
   bool isPopular = false;
   bool isFavourite = false;
   bool isLoading = false;
-
-  final List<String> availableColors = [
-    'Red',
-    'Blue',
-    'Green',
-    'Yellow',
-    'Black',
-    'White',
-    'Purple',
-    'Orange',
-    'Pink',
-    'Brown',
-  ];
 
   Future<void> _pickImages() async {
     final List<XFile> images = await _picker.pickMultiImage();
@@ -56,19 +44,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
-  void _toggleColor(String color) {
-    setState(() {
-      if (colors.contains(color)) {
-        colors.remove(color);
-      } else {
-        colors.add(color);
-      }
-    });
-  }
-
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate() && selectedImages.isNotEmpty) {
-      _formKey.currentState!.save(); // Ensure form fields are saved
+    if (_formKey.currentState!.validate() && selectedImages.isNotEmpty && category != null) {
+      _formKey.currentState!.save();
       setState(() {
         isLoading = true;
       });
@@ -96,7 +74,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           description: description!,
           price: price!,
           images: imageUrls,
-          colors: colors,
+          category: category!,
           isPopular: isPopular,
           isFavourite: isFavourite,
         );
@@ -118,6 +96,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
     } else if (selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select at least one image')),
+      );
+    } else if (category == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a category')),
       );
     }
   }
@@ -268,25 +250,29 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Product Colors
+                    // Product Category
                     const Text(
-                      'Available Colors',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      'Category',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
-                      children: availableColors.map((color) {
-                        bool isSelected = colors.contains(color);
-                        return FilterChip(
-                          label: Text(color),
+                      children: categories.map((cat) {
+                        final isSelected = category == cat;
+                        return ChoiceChip(
+                          label: Text(cat),
                           selected: isSelected,
-                          onSelected: (selected) => _toggleColor(color),
+                          onSelected: (selected) {
+                            setState(() {
+                              category = selected ? cat : null;
+                            });
+                          },
                           selectedColor: kPrimaryColor.withOpacity(0.2),
-                          checkmarkColor: kPrimaryColor,
+                          labelStyle: TextStyle(
+                            color: isSelected ? kPrimaryColor : Colors.black,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
                         );
                       }).toList(),
                     ),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -19,6 +20,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final image = product.images.isNotEmpty ? product.images[0] : null;
+    final isNetwork = image != null && (
+      image.startsWith('http://') ||
+      image.startsWith('https://') ||
+      image.contains('firebasestorage.googleapis.com')
+    );
     return SizedBox(
       width: width,
       child: GestureDetector(
@@ -34,7 +41,11 @@ class ProductCard extends StatelessWidget {
                   color: kSecondaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Image.asset(product.images[0]),
+                child: image == null
+                    ? const Icon(Icons.image)
+                    : isNetwork
+                        ? Image.network(image)
+                        : Image.asset(image),
               ),
             ),
             const SizedBox(height: 8),

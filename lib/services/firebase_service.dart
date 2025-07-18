@@ -98,7 +98,7 @@ class FirebaseService {
     required String description,
     required double price,
     required List<String> images,
-    required List<String> colors,
+    required String category,
     double rating = 0.0,
     bool isPopular = false,
     bool isFavourite = false,
@@ -109,7 +109,7 @@ class FirebaseService {
       'description': description,
       'price': price,
       'images': images,
-      'colors': colors,
+      'category': category,
       'rating': rating,
       'isPopular': isPopular,
       'isFavourite': isFavourite,
@@ -333,5 +333,56 @@ class FirebaseService {
         'totalRevenue': 0.0,
       };
     }
+  }
+
+  // Cart management
+  Future<void> addToCart({
+    required String userId,
+    required Map<String, dynamic> product, // Assuming Product object is a Map
+    int quantity = 1,
+  }) async {
+    final cartItemRef = _firestore.collection('carts').doc(userId).collection('items').doc(product['id']);
+    final doc = await cartItemRef.get();
+    if (doc.exists) {
+      // Increment quantity
+      await cartItemRef.update({
+        'quantity': FieldValue.increment(quantity),
+      });
+    } else {
+      await cartItemRef.set({
+        'productId': product['id'],
+        'title': product['title'],
+        'price': product['price'],
+        'image': product['images'].isNotEmpty ? product['images'][0] : '',
+        'quantity': quantity,
+        'category': product['category'],
+      });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getCartItems(String userId) async {
+    final snapshot = await _firestore.collection('carts').doc(userId).collection('items').get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  }
+
+  Future<void> removeCartItem({
+    required String userId,
+    required String productId,
+  }) async {
+    await _firestore.collection('carts').doc(userId).collection('items').doc(productId).delete();
+  }
+
+  Future<void> updateCartItemQuantity({
+    required String userId,
+    required String productId,
+    required int quantity,
+  }) async {
+    await _firestore.collection('carts').doc(userId).collection('items').doc(productId).update({
+      'quantity': quantity,
+    });
   }
 } 
