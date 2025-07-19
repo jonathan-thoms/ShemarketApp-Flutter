@@ -24,7 +24,7 @@ class FirebaseService {
       return null;
     }
   }
-
+  
   Future<UserCredential?> signIn(String email, String password) async {
     try {
       return await _auth.signInWithEmailAndPassword(
@@ -177,6 +177,9 @@ class FirebaseService {
     required int quantity,
     required double totalPrice,
     required String shippingAddress,
+    String? buyerName,
+    String? buyerEmail,
+    String? buyerPhone,
   }) async {
     await _firestore.collection('orders').add({
       'customerId': customerId,
@@ -187,6 +190,9 @@ class FirebaseService {
       'shippingAddress': shippingAddress,
       'status': 'pending', // pending, confirmed, shipped, delivered, cancelled
       'createdAt': FieldValue.serverTimestamp(),
+      'buyerName': buyerName ?? '',
+      'buyerEmail': buyerEmail ?? '',
+      'buyerPhone': buyerPhone ?? '',
     });
   }
 
@@ -351,6 +357,7 @@ class FirebaseService {
     } else {
       await cartItemRef.set({
         'productId': product['id'],
+        'sellerId': product['sellerId'],
         'title': product['title'],
         'price': product['price'],
         'image': product['images'].isNotEmpty ? product['images'][0] : '',
@@ -384,5 +391,129 @@ class FirebaseService {
     await _firestore.collection('carts').doc(userId).collection('items').doc(productId).update({
       'quantity': quantity,
     });
+  }
+
+  Future<List<Map<String, dynamic>>> getUserGrowth({int days = 30}) async {
+    final now = DateTime.now();
+    final cutoff = Timestamp.fromDate(now.subtract(Duration(days: days)));
+    final snapshot = await _firestore.collection('users')
+      .where('createdAt', isGreaterThanOrEqualTo: cutoff)
+      .orderBy('createdAt')
+      .get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getProductGrowth({int days = 30}) async {
+    final now = DateTime.now();
+    final cutoff = Timestamp.fromDate(now.subtract(Duration(days: days)));
+    final snapshot = await _firestore.collection('products')
+      .where('createdAt', isGreaterThanOrEqualTo: cutoff)
+      .orderBy('createdAt')
+      .get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getOrderVolume({int days = 30}) async {
+    final now = DateTime.now();
+    final cutoff = Timestamp.fromDate(now.subtract(Duration(days: days)));
+    final snapshot = await _firestore.collection('orders')
+      .where('createdAt', isGreaterThanOrEqualTo: cutoff)
+      .orderBy('createdAt')
+      .get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getRevenueTrends({int days = 30}) async {
+    final now = DateTime.now();
+    final cutoff = Timestamp.fromDate(now.subtract(Duration(days: days)));
+    final snapshot = await _firestore.collection('orders')
+      .where('createdAt', isGreaterThanOrEqualTo: cutoff)
+      .where('status', isEqualTo: 'delivered')
+      .orderBy('createdAt')
+      .get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getTopSellers({int limit = 5}) async {
+    final snapshot = await _firestore.collection('orders')
+      .where('status', isEqualTo: 'delivered')
+      .get();
+    final Map<String, double> sellerRevenue = {};
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      final sellerId = data['sellerId'] ?? '';
+      final totalPrice = (data['totalPrice'] ?? 0.0).toDouble();
+      sellerRevenue[sellerId] = (sellerRevenue[sellerId] ?? 0) + totalPrice;
+    }
+    final sorted = sellerRevenue.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.take(limit).map((e) => {'sellerId': e.key, 'revenue': e.value}).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getTopProducts({int limit = 5}) async {
+    final snapshot = await _firestore.collection('orders')
+      .where('status', isEqualTo: 'delivered')
+      .get();
+    final Map<String, int> productCount = {};
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      final productId = data['productId'] ?? '';
+      final quantity = (data['quantity'] ?? 1);
+      productCount[productId] = (productCount[productId] ?? 0) + (quantity is int ? quantity : (quantity as num).toInt());
+    }
+    final sorted = productCount.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.take(limit).map((e) => {'productId': e.key, 'quantity': e.value}).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getSystemLogs({int limit = 20}) async {
+    // Get recent events from users, products, and orders
+    final userSnap = await _firestore.collection('users').orderBy('createdAt', descending: true).limit(limit).get();
+    final productSnap = await _firestore.collection('products').orderBy('createdAt', descending: true).limit(limit).get();
+    final orderSnap = await _firestore.collection('orders').orderBy('createdAt', descending: true).limit(limit).get();
+    final logs = <Map<String, dynamic>>[];
+    logs.addAll(userSnap.docs.map((doc) => {'type': 'user', ...doc.data(), 'id': doc.id}));
+    logs.addAll(productSnap.docs.map((doc) => {'type': 'product', ...doc.data(), 'id': doc.id}));
+    logs.addAll(orderSnap.docs.map((doc) => {'type': 'order', ...doc.data(), 'id': doc.id}));
+    logs.sort((a, b) {
+      final aTime = a['createdAt'] is Timestamp ? (a['createdAt'] as Timestamp).millisecondsSinceEpoch : 0;
+      final bTime = b['createdAt'] is Timestamp ? (b['createdAt'] as Timestamp).millisecondsSinceEpoch : 0;
+      return bTime.compareTo(aTime);
+    });
+    return logs.take(limit).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+     final snapshot = await _firestore.collection('users').orderBy('createdAt', descending: true).get();
+     return snapshot.docs.map((doc) {
+       final data = doc.data();
+       data['id'] = doc.id;
+       return data;
+     }).toList();
+   }
+
+  Future<List<Map<String, dynamic>>> getAllOrders() async {
+    final snapshot = await _firestore.collection('orders').orderBy('createdAt', descending: true).get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
   }
 } 

@@ -48,6 +48,22 @@ class _CartScreenState extends State<CartScreen> {
     _loadCart();
   }
 
+  Future<void> _updateCartItemQuantity(String productId, int quantity) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    
+    if (quantity <= 0) {
+      await _removeCartItem(productId);
+    } else {
+      await _firebaseService.updateCartItemQuantity(
+        userId: user.uid,
+        productId: productId,
+        quantity: quantity,
+      );
+      _loadCart();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,31 +91,20 @@ class _CartScreenState extends State<CartScreen> {
                     itemCount: cartItems.length,
                     itemBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Dismissible(
-                        key: Key(cartItems[index]['productId'] ?? cartItems[index]['id']),
-                        direction: DismissDirection.endToStart,
-                        onDismissed: (direction) {
-                          _removeCartItem(cartItems[index]['productId'] ?? cartItems[index]['id']);
-                        },
-                        background: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFE6E6),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Row(
-                            children: [
-                              const Spacer(),
-                              SvgPicture.asset("assets/icons/Trash.svg"),
-                            ],
-                          ),
+                      child: CartCard(
+                        cartItem: cartItems[index],
+                        onRemove: () => _removeCartItem(
+                          cartItems[index]['productId'] ?? cartItems[index]['id'],
                         ),
-                        child: CartCard(cartItem: cartItems[index]),
+                        onQuantityChanged: (quantity) => _updateCartItemQuantity(
+                          cartItems[index]['productId'] ?? cartItems[index]['id'],
+                          quantity,
+                        ),
                       ),
                     ),
                   ),
                 ),
-      bottomNavigationBar: const CheckoutCard(),
+      bottomNavigationBar: CheckoutCard(cartItems: cartItems),
     );
   }
 }

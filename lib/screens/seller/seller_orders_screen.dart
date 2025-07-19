@@ -255,6 +255,30 @@ class _SellerOrdersScreenState extends State<SellerOrdersScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                     
+                                    // Buyer Details
+                                    const Text(
+                                      'Buyer Details',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Name: ${order['buyerName'] ?? 'N/A'}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      'Email: ${order['buyerEmail'] ?? 'N/A'}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      'Phone: ${order['buyerPhone'] ?? 'N/A'}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    
                                     // Shipping Address
                                     const Text(
                                       'Shipping Address',

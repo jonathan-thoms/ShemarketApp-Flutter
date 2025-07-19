@@ -20,6 +20,8 @@ import 'screens/seller/seller_analytics_screen.dart';
 import 'screens/seller/add_product_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/admin/admin_dashboard_screen.dart';
+import 'screens/checkout/checkout_screen.dart';
+import 'screens/order_success/order_success_screen.dart';
 
 // We use name route
 // All our routes will be available here
@@ -46,4 +48,8 @@ final Map<String, WidgetBuilder> routes = {
   SellerAnalyticsScreen.routeName: (context) => const SellerAnalyticsScreen(),
   AddProductScreen.routeName: (context) => const AddProductScreen(),
   AdminDashboardScreen.routeName: (context) => const AdminDashboardScreen(),
+  
+  // Checkout routes
+  CheckoutScreen.routeName: (context) => const CheckoutScreen(),
+  OrderSuccessScreen.routeName: (context) => const OrderSuccessScreen(),
 };

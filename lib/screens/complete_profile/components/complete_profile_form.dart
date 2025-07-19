@@ -72,7 +72,20 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
           TextFormField(
-            onSaved: (newValue) => lastName = newValue,
+            onSaved: (newValue) => lastName = newValue ?? '', // Ensure lastName is never null
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                removeError(error: kNamelNullError);
+              }
+              return;
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                addError(error: kNamelNullError);
+                return "";
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               labelText: "Last Name",
               hintText: "Enter your last name",
@@ -137,44 +150,44 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           FormError(errors: errors),
           const SizedBox(height: 20),
           
-          // User Type Selection
-          const Text(
-            'Account Type',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('Customer'),
-                  value: 'customer',
-                  groupValue: userType,
-                  onChanged: (value) {
-                    setState(() {
-                      userType = value!;
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('Seller'),
-                  value: 'seller',
-                  groupValue: userType,
-                  onChanged: (value) {
-                    setState(() {
-                      userType = value!;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+          // Remove the User Type Selection
+          // const Text(
+          //   'Account Type',
+          //   style: TextStyle(
+          //     fontSize: 16,
+          //     fontWeight: FontWeight.w600,
+          //   ),
+          // ),
+          // const SizedBox(height: 8),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: RadioListTile<String>(
+          //         title: const Text('Customer'),
+          //         value: 'customer',
+          //         groupValue: userType,
+          //         onChanged: (value) {
+          //           setState(() {
+          //             userType = value!;
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //     Expanded(
+          //       child: RadioListTile<String>(
+          //         title: const Text('Seller'),
+          //         value: 'seller',
+          //         groupValue: userType,
+          //         onChanged: (value) {
+          //           setState(() {
+          //             userType = value!;
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(height: 20),
           
           ElevatedButton(
             onPressed: isLoading ? null : () async {
@@ -189,7 +202,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                     // Get email from arguments or use current user email
                     final args = ModalRoute.of(context)?.settings.arguments;
                     final email = args as String? ?? user.email ?? '';
-                    
+                    _formKey.currentState!.save(); // Ensure all fields are saved
                     await _firebaseService.createUserProfile(
                       uid: user.uid,
                       email: email,
@@ -197,7 +210,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                       lastName: lastName ?? '',
                       phoneNumber: phoneNumber!,
                       address: address!,
-                      userType: userType,
+                      userType: 'customer', // Always set to customer
                     );
 
                     // Navigate to main navigation after profile creation

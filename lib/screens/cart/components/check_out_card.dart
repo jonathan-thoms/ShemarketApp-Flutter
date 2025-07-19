@@ -6,7 +6,18 @@ import '../../../constants.dart';
 class CheckoutCard extends StatelessWidget {
   const CheckoutCard({
     Key? key,
+    required this.cartItems,
   }) : super(key: key);
+
+  final List<Map<String, dynamic>> cartItems;
+
+  double get totalAmount {
+    return cartItems.fold(0.0, (sum, item) {
+      final price = (item['price'] ?? 0.0).toDouble();
+      final quantity = (item['quantity'] ?? 1).toInt();
+      return sum + (price * quantity);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +26,6 @@ class CheckoutCard extends StatelessWidget {
         vertical: 16,
         horizontal: 20,
       ),
-      // height: 174,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -60,14 +70,14 @@ class CheckoutCard extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text.rich(
                     TextSpan(
                       text: "Total:\n",
                       children: [
                         TextSpan(
-                          text: "\$337.15",
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          text: "\$${totalAmount.toStringAsFixed(2)}",
+                          style: const TextStyle(fontSize: 16, color: Colors.black),
                         ),
                       ],
                     ),
@@ -75,7 +85,9 @@ class CheckoutCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: cartItems.isNotEmpty ? () {
+                      Navigator.pushNamed(context, '/checkout');
+                    } : null,
                     child: const Text("Check Out"),
                   ),
                 ),

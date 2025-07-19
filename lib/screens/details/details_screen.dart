@@ -123,6 +123,7 @@ class DetailsScreen extends StatelessWidget {
                     'price': product.price,
                     'images': product.images,
                     'category': product.category,
+                    'sellerId': product.sellerId ?? '', // Fix: use sellerId from Product model
                   },
                   quantity: 1,
                 );

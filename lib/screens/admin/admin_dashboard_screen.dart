@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/firebase_service.dart';
+import 'manage_users_screen.dart';
+import 'manage_orders_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   static String routeName = "/admin_dashboard";
@@ -14,6 +16,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   List<Map<String, dynamic>> pendingProducts = [];
   Map<String, dynamic> analytics = {};
   bool isLoading = true;
+  List<Map<String, dynamic>> userGrowth = [];
+  List<Map<String, dynamic>> productGrowth = [];
+  List<Map<String, dynamic>> orderVolume = [];
+  List<Map<String, dynamic>> revenueTrends = [];
+  List<Map<String, dynamic>> topSellers = [];
+  List<Map<String, dynamic>> topProducts = [];
+  List<Map<String, dynamic>> systemLogs = [];
 
   @override
   void initState() {
@@ -25,9 +34,23 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     setState(() { isLoading = true; });
     final products = await _firebaseService.getPendingProducts();
     final stats = await _firebaseService.getAdminAnalytics();
+    final users = await _firebaseService.getUserGrowth();
+    final prodGrowth = await _firebaseService.getProductGrowth();
+    final orders = await _firebaseService.getOrderVolume();
+    final revenue = await _firebaseService.getRevenueTrends();
+    final sellers = await _firebaseService.getTopSellers();
+    final productsTop = await _firebaseService.getTopProducts();
+    final logs = await _firebaseService.getSystemLogs();
     setState(() {
       pendingProducts = products;
       analytics = stats;
+      userGrowth = users;
+      productGrowth = prodGrowth;
+      orderVolume = orders;
+      revenueTrends = revenue;
+      topSellers = sellers;
+      topProducts = productsTop;
+      systemLogs = logs;
       isLoading = false;
     });
   }
@@ -76,6 +99,95 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         ],
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Advanced Analytics
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Advanced Analytics', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Text('User Growth (last 30 days): ${userGrowth.length}'),
+                          Text('Product Growth (last 30 days): ${productGrowth.length}'),
+                          Text('Order Volume (last 30 days): ${orderVolume.length}'),
+                          Text('Revenue (last 30 days): \$${revenueTrends.fold(0.0, (sum, e) => sum + (e['totalPrice'] ?? 0.0)).toStringAsFixed(2)}'),
+                          const SizedBox(height: 8),
+                          Text('Top Sellers:'),
+                          ...topSellers.map((s) => Text('Seller: ${s['sellerId']} Revenue: \$${s['revenue'].toStringAsFixed(2)}')),
+                          const SizedBox(height: 8),
+                          Text('Top Products:'),
+                          ...topProducts.map((p) => Text('Product: ${p['productId']} Sold: ${p['quantity']}')),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // System Logs
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('System Logs', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          ...systemLogs.map((log) => Text('[${log['type']}] ${log['id']} - ${log['createdAt'] != null ? log['createdAt'].toDate().toString() : ''}')),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Quick Actions
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ManageUsersScreen()),
+                            );
+                          },
+                          child: const Text('Manage Users'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ManageOrdersScreen()),
+                            );
+                          },
+                          child: const Text('Manage Orders'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Export Data'),
+                                content: const Text('Export functionality coming soon!'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: const Text('Export Data'),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   // Pending Products

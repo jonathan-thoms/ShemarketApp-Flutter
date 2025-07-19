@@ -7,6 +7,7 @@ class Product {
   final double rating, price;
   final bool isFavourite, isPopular;
   final String? category;
+  final String? sellerId;
 
   Product({
     this.id,
@@ -18,6 +19,7 @@ class Product {
     required this.price,
     required this.description,
     this.category,
+    this.sellerId,
   });
 
   factory Product.fromMap(Map<String, dynamic> map, {String? id}) {
@@ -31,6 +33,7 @@ class Product {
       price: (map['price'] ?? 0.0).toDouble(),
       description: map['description'] ?? '',
       category: map['category'],
+      sellerId: map['sellerId'],
     );
   }
 }
