@@ -3,6 +3,7 @@ import 'home/home_screen.dart';
 import 'cart/cart_screen.dart';
 import 'profile/profile_screen.dart';
 import 'seller/seller_dashboard_screen.dart';
+import 'products/search_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   static String routeName = "/main_navigation";
@@ -17,7 +18,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const _SearchScreen(),
+    const SearchScreen(),
     const SellerDashboardScreen(),
     const CartScreen(),
     const ProfileScreen(),
@@ -61,20 +62,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             label: 'Profile',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SearchScreen extends StatelessWidget {
-  const _SearchScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Search Coming Soon',
-        style: TextStyle(fontSize: 24, color: Colors.grey),
       ),
     );
   }

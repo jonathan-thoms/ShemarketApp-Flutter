@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/firebase_service.dart';
 import 'manage_users_screen.dart';
 import 'manage_orders_screen.dart';
+import 'manage_products_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   static String routeName = "/admin_dashboard";
@@ -164,6 +165,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             );
                           },
                           child: const Text('Manage Orders'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ManageProductsScreen()),
+                            );
+                          },
+                          child: const Text('Manage Products'),
                         ),
                       ),
                       const SizedBox(width: 12),

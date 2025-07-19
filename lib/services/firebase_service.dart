@@ -77,6 +77,10 @@ class FirebaseService {
     }
   }
 
+  Future<void> updateUserProfile(String userId, Map<String, dynamic> data) async {
+    await _firestore.collection('users').doc(userId).update(data);
+  }
+
   // Product management
   Future<String> uploadProductImage(XFile imageFile) async {
     String fileName = '${_uuid.v4()}.jpg';
@@ -514,6 +518,41 @@ class FirebaseService {
       final data = doc.data();
       data['id'] = doc.id;
       return data;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getAllProducts() async {
+    final snapshot = await _firestore.collection('products').orderBy('createdAt', descending: true).get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  }
+
+  Future<void> updateUserStatus(String userId, bool isActive) async {
+    await _firestore.collection('users').doc(userId).update({'isActive': isActive});
+  }
+
+  Future<void> deleteUser(String userId) async {
+    await _firestore.collection('users').doc(userId).delete();
+  }
+
+  Future<List<Map<String, dynamic>>> searchProducts(String query) async {
+    final snapshot = await _firestore.collection('products')
+      .where('isActive', isEqualTo: true)
+      .where('isApproved', isEqualTo: true)
+      .get();
+    final lowerQuery = query.toLowerCase();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).where((product) {
+      final title = (product['title'] ?? '').toString().toLowerCase();
+      final desc = (product['description'] ?? '').toString().toLowerCase();
+      final category = (product['category'] ?? '').toString().toLowerCase();
+      return title.contains(lowerQuery) || desc.contains(lowerQuery) || category.contains(lowerQuery);
     }).toList();
   }
 } 
