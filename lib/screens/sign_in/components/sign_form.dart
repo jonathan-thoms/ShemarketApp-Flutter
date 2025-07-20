@@ -148,9 +148,9 @@ class _SignFormState extends State<SignForm> {
                   final userCredential = await _firebaseService.signIn(email!, password!);
                   if (userCredential != null) {
                     if (userCredential.user?.email == 'admin@shemarket.com') {
-                      Navigator.pushReplacementNamed(context, '/admin_dashboard');
+                      Navigator.pushNamedAndRemoveUntil(context, '/admin_dashboard', (route) => false);
                     } else {
-                      Navigator.pushReplacementNamed(context, '/main_navigation');
+                      Navigator.pushNamedAndRemoveUntil(context, '/main_navigation', (route) => false);
                     }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(

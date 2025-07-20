@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 import '../sign_in/sign_in_screen.dart';
 import 'components/splash_content.dart';
+import '../../services/firebase_service.dart';
 
 class SplashScreen extends StatefulWidget {
   static String routeName = "/splash";
@@ -30,6 +31,24 @@ class _SplashScreenState extends State<SplashScreen> {
       "image": "assets/images/splash_3.png"
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    final user = FirebaseService().currentUser;
+    if (user != null) {
+      if (user.email == 'admin@shemarket.com') {
+        Navigator.pushReplacementNamed(context, '/admin_dashboard');
+      } else {
+        Navigator.pushReplacementNamed(context, '/main_navigation');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

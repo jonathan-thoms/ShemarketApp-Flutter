@@ -214,7 +214,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                     );
 
                     // Navigate to main navigation after profile creation
-                    Navigator.pushReplacementNamed(context, '/main_navigation');
+                    Navigator.pushNamedAndRemoveUntil(context, '/main_navigation', (route) => false);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('User not authenticated')),

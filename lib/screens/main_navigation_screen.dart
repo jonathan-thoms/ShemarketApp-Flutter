@@ -32,36 +32,47 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.storefront),
-            label: 'Sell',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (_selectedIndex != 0) {
+          setState(() {
+            _selectedIndex = 0;
+          });
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Theme.of(context).primaryColor,
+          unselectedItemColor: Colors.grey,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.storefront),
+              label: 'Sell',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart),
+              label: 'Cart',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

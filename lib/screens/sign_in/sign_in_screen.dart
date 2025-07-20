@@ -3,13 +3,31 @@ import 'package:flutter/material.dart';
 import '../../components/no_account_text.dart';
 import '../../components/socal_card.dart';
 import 'components/sign_form.dart';
+import '../../services/firebase_service.dart';
 
 class SignInScreen extends StatelessWidget {
   static String routeName = "/sign_in";
 
   const SignInScreen({super.key});
+
+  void _checkLoginStatus(BuildContext context) {
+    final user = FirebaseService().currentUser;
+    if (user != null) {
+      if (user.email == 'admin@shemarket.com') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacementNamed(context, '/admin_dashboard');
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacementNamed(context, '/main_navigation');
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _checkLoginStatus(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sign In"),
