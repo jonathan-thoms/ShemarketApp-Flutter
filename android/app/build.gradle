@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         applicationId "com.shemarket.app"
-        minSdkVersion 21           // Or flutter.minSdkVersion if you're dynamically managing it
+        minSdkVersion 19           // Or flutter.minSdkVersion if you're dynamically managing it
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
