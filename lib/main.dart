@@ -6,6 +6,9 @@ import 'package:shop_app/screens/splash/splash_screen.dart';
 import 'routes.dart';
 import 'theme.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:html' as html;
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
@@ -38,7 +41,18 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+
+  // Listen for the custom back button event from Capacitor
+  html.window.addEventListener('androidBackButton', (event) {
+    // Try to pop the current route
+    if (navigatorKey.currentState != null && navigatorKey.currentState!.canPop()) {
+      navigatorKey.currentState!.maybePop();
+    }
+    // If you want to show a dialog or toast when on the home screen, you can do it here
+    // Otherwise, do nothing to prevent the app from closing
+  });
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -48,6 +62,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey, // <-- Add this line
       debugShowCheckedModeBanner: false,
       title: 'The Flutter Way - Template',
       theme: AppTheme.lightTheme(context),
