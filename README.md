@@ -1,47 +1,52 @@
-# Flutter E-Commerce App Template
+# 🛍️ SheMarket – Empowering Local Women Entrepreneurs
 
-### Checkout [Serverpod.dev](https://cutt.ly/Per1Z7ri) - The Flutter Backend
+**SheMarket** is a mobile marketplace app that allows women entrepreneurs to showcase, sell, and manage their products locally. Originally built using React and Capacitor, this new version is fully rebuilt using **Flutter** for better performance, richer UI, and scalable backend integration via **Firebase**.
 
- If you want to learn how to build this ecommerce template on Flutter [watch the playlist on YouTube](https://youtube.com/playlist?list=PLxUBb2A_UUy8OlaNZpS2mfL8xpHcnd_Af), In the first video, we start by making a neat onboarding screen for our shopping app. This works on both Android and iOS because it's made with Flutter. In the next video, we tackle the 'Sign In' and 'Forgot Password' screens, adding some unique error messages. The third video covers the 'Sign Up' and OTP processes. The fourth one is fun – we create the main homepage. In the fifth, we dive into the product page, and in the sixth, we craft an order page with cool features like 'swipe to delete.' Finally, in the seventh video, we design the user profile page.
+---
 
-Visit FlutterLibrary.com to Download the [Flutter e-commerce app template](https://www.flutterlibrary.com/templates/e-commerce-app) & other templates, and components.
+## 🚀 Features
+
+### 👩‍💼 For Sellers
+- Add products with images, descriptions, categories, and pricing
+- Dashboard to view pending/approved listings
+- Real-time status updates on product approvals
+
+### 🛒 For Buyers
+- Browse products by category or search
+- View seller profiles and product details
+- Add to cart and place orders (UPI support coming soon)
+
+### 🛠️ Admin Panel
+- Product approval and moderation system
+- View all users and seller activity
+- Basic analytics and logs
+
+---
+
+## 🧱 Tech Stack
+
+| Layer            | Tech Used                     |
+|------------------|-------------------------------|
+| UI               | Flutter (Dart)                |
+| State Management | `setState` / (Provider/Riverpod if used) |
+| Backend          | Firebase (Firestore, Auth, Storage) |
+| Deployment       | Android (via Flutter build)   |
+
+---
+
+1. Clone the repo
+git clone https://github.com/yourusername/SheMarket-Flutter.git
+cd SheMarket-Flutter
+
+2. Install dependencies
+flutter pub get
+
+3. Run the app
+flutter run
 
 
-### Video Preview of the Shop template
+🤝 Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-![Preview](/intro.gif)
-
-## Screens it contains:
-
-=> Onboarding
-
-=> Login
-
-=> Forgot Password
-
-=> Sign Up
-
-=> Complete Profile
-
-=> OTP Verification
-
-=> Home Page
-
-=> Product Details
-
-=> Order
-
-=> Profile (added)
-
-=> Bottom Navigation Bar (added)
-
-Now it contains all the screen, thanks for your love and support 🙏 
-
-## Photos
-![Preview](/1.png)
-![Preview](2.png)
-![Preview](3.png)
-![Preview](4.png)
-![Preview](5.png)
-![Preview](6.png)
-![Preview](7.png)
+📃 License
+This project is licensed under the MIT License.
